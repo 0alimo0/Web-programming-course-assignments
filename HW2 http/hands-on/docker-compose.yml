@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  jwt-proxy:
+    build: ./proxy
+    container_name: jwt-reverse-proxy
+    ports:
+      - "80:80"
+    environment:
+      - JWT_SECRET=super-secret-key-12345
+      - BACKEND_SERVICE_URL=http://legacy-app:8080
+    networks:
+      - internal_network
+    depends_on:
+      - legacy-app
+
+  # legacy
+  legacy-app:
+    image: ghcr.io/mccutchen/go-httpbin
+    container_name: legacy-httpbin
+    expose:
+      - "8080"
+    networks:
+      - internal_network
+
+networks:
+  internal_network:
+    driver: bridge
